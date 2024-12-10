@@ -3,61 +3,81 @@ import json
 import datetime
 import csv
 import random
+import nltk
+import ssl
 import streamlit as st
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from plyer import notification
-import schedule
-import time
-import threading
+
+# SSL context for nltk download
+ssl._create_default_https_context = ssl._create_unverified_context
+nltk.data.path.append(os.path.abspath("nltk_data"))
+nltk.download('punkt')
 
 # Load intents from the JSON file
 file_path = os.path.abspath("./intents.json")
 with open(file_path, "r") as file:
     intents = json.load(file)
 
-# Create the vectorizer and classifier for the chatbot
+# Initialize vectorizer and classifier
 vectorizer = TfidfVectorizer(ngram_range=(1, 4))
 clf = LogisticRegression(random_state=0, max_iter=10000)
 
 # Preprocess the data
 tags = []
 patterns = []
-for intent in intents:
+for intent in intents['intents']:
     for pattern in intent['patterns']:
         tags.append(intent['tag'])
         patterns.append(pattern)
 
-# Training the model
+# Train the model
 x = vectorizer.fit_transform(patterns)
 y = tags
 clf.fit(x, y)
 
-def chatbot(input_text):
-    input_text = vectorizer.transform([input_text])
-    tag = clf.predict(input_text)[0]
-    for intent in intents:
-        if intent['tag'] == tag:
-            response = random.choice(intent['responses'])
-            return response
+# Store tasks in a CSV file
+TASK_FILE = "tasks.csv"
 
-# Task Management system
-tasks = []
+# Check if the task file exists, if not, create it
+if not os.path.exists(TASK_FILE):
+    with open(TASK_FILE, 'w', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Task', 'Deadline', 'Priority'])  # Header
 
-def add_task(task_name, deadline_str):
-    deadline = datetime.datetime.strptime(deadline_str, "%Y-%m-%d %H:%M:%S")
-    tasks.append({"task": task_name, "deadline": deadline})
-    tasks.sort(key=lambda x: x['deadline'])  # Sort tasks by deadline
+# Function to add a task to CSV file
+def add_task(task, deadline):
+    priority = "Medium"  # Default priority
+    task_data = [task, deadline, priority]
+    with open(TASK_FILE, 'a', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerow(task_data)
 
+# Function to retrieve tasks sorted by deadline
 def get_next_task():
+    tasks = []
+    with open(TASK_FILE, 'r', encoding='utf-8') as file:
+        reader = csv.reader(file)
+        next(reader)  # Skip header row
+        tasks = sorted(list(reader), key=lambda x: x[1])  # Sort by deadline
+    
     if tasks:
-        next_task = tasks[0]  # The task with the earliest deadline
-        task_name = next_task["task"]
-        deadline_str = next_task["deadline"].strftime("%Y-%m-%d %H:%M:%S")
-        return f"Your next task is: {task_name} at {deadline_str}"
-    return "You have no tasks scheduled."
+        next_task = tasks[0]  # First task is the next one to do
+        task_name = next_task[0]
+        deadline_str = next_task[1]
+        deadline = datetime.datetime.strptime(deadline_str, "%Y-%m-%d %H:%M:%S")
+        time_remaining = deadline - datetime.datetime.now()
+        
+        # Send notification if the task is due soon (within 5 minutes)
+        if time_remaining.total_seconds() < 300:  # 5 minutes
+            send_local_notification(task_name, str(time_remaining))
+        
+        return f"Your next task is: {task_name} with deadline {next_task[1]}"
+    else:
+        return "You have no upcoming tasks!"
 
-# Function for local notifications
+# Function to send a local notification
 def send_local_notification(task_name, time_remaining):
     notification.notify(
         title=f"Upcoming Task: {task_name}",
@@ -65,67 +85,59 @@ def send_local_notification(task_name, time_remaining):
         timeout=10  # Notification duration in seconds
     )
 
-# Function to check for upcoming tasks and send notifications
-def check_for_upcoming_tasks():
-    while True:
-        if tasks:
-            next_task = tasks[0]
-            time_remaining = next_task["deadline"] - datetime.datetime.now()
-            if time_remaining.total_seconds() < 300:  # 5 minutes
-                send_local_notification(next_task["task"], str(time_remaining))
-        time.sleep(60)  # Check every minute
+# Function to predict user input and return response
+def chatbot(input_text):
+    input_text = vectorizer.transform([input_text])
+    tag = clf.predict(input_text)[0]
+    
+    for intent in intents['intents']:
+        if intent['tag'] == tag:
+            # Handle task management intent
+            if tag == "task_management":
+                # Example: "Finish the report by 5 PM"
+                task_info = input_text.split(" by ")
+                if len(task_info) == 2:
+                    task = task_info[0]
+                    deadline = task_info[1]
+                    add_task(task, deadline)
+                    return "Task added successfully!"
+            elif tag == "next_task":
+                return get_next_task()
+            else:
+                return random.choice(intent['responses'])
+    
+    return "Sorry, I didn't understand that."
 
-# Function to start checking tasks in a separate thread
-def start_task_checking():
-    task_thread = threading.Thread(target=check_for_upcoming_tasks, daemon=True)
-    task_thread.start()
-
-# Streamlit app
 def main():
-    st.title("AI-Based Time Management and Task Prioritization")
+    st.title("Task Management Chatbot")
 
-    # Create a sidebar menu with options
-    menu = ["Home", "Add Task", "Chatbot", "Task History", "About"]
+    # Sidebar menu
+    menu = ["Home", "Task History", "About"]
     choice = st.sidebar.selectbox("Menu", menu)
 
     if choice == "Home":
-        st.write("Welcome to the Task Management and Prioritization system.")
-        st.write("You can add tasks, chat with the AI chatbot, and see your task history.")
+        st.write("Welcome to the chatbot! Type your task, and I will manage it for you.")
 
-    elif choice == "Add Task":
-        st.subheader("Add a New Task")
-        task_name = st.text_input("Task Name:")
-        deadline_str = st.text_input("Deadline (YYYY-MM-DD HH:MM:SS):")
+        user_input = st.text_input("Enter task or ask for next task:")
 
-        if st.button("Add Task"):
-            add_task(task_name, deadline_str)
-            st.write(f"Task '{task_name}' added successfully with a deadline of {deadline_str}.")
-
-    elif choice == "Chatbot":
-        st.subheader("Chat with the AI Chatbot")
-        user_input = st.text_input("You:", key="chatbot_input")
-        
         if user_input:
             response = chatbot(user_input)
-            st.text_area("Chatbot:", value=response, height=120, max_chars=None, key="chatbot_response")
+            st.text_area("Chatbot:", value=response, height=120)
 
     elif choice == "Task History":
-        st.subheader("Task History")
-        if tasks:
-            for task in tasks:
-                st.text(f"Task: {task['task']}, Deadline: {task['deadline'].strftime('%Y-%m-%d %H:%M:%S')}")
-        else:
-            st.write("You have no tasks scheduled.")
+        st.write("Here are your stored tasks:")
+        with open(TASK_FILE, 'r', encoding='utf-8') as file:
+            reader = csv.reader(file)
+            next(reader)  # Skip header row
+            for row in reader:
+                st.write(f"Task: {row[0]}, Deadline: {row[1]}, Priority: {row[2]}")
 
     elif choice == "About":
-        st.subheader("About")
         st.write("""
-        This project is an AI-based Time Management and Task Prioritization system. The chatbot is built using Natural Language Processing (NLP) techniques and Logistic Regression. 
-        The task manager allows you to add tasks with deadlines, and it will notify you about upcoming tasks. 
-        The system also prioritizes tasks based on their deadlines.
+        This chatbot helps you manage your tasks and prioritize them based on deadlines.
+        You can input your tasks along with deadlines, and it will keep track of them.
+        When you ask, it will tell you your next task to do.
         """)
 
-if __name__ == '__main__':
-    # Start task checking in a separate thread
-    start_task_checking()
+if __name__ == "__main__":
     main()
