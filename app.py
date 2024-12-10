@@ -63,17 +63,8 @@ def get_next_task():
         tasks = sorted(list(reader), key=lambda x: x[1])  # Sort by deadline
     
     if tasks:
-        next_task = tasks[0]  # First task is the next one to do
-        task_name = next_task[0]
-        deadline_str = next_task[1]
-        deadline = datetime.datetime.strptime(deadline_str, "%Y-%m-%d %H:%M:%S")
-        time_remaining = deadline - datetime.datetime.now()
-        
-        # Send notification if the task is due soon (within 5 minutes)
-        if time_remaining.total_seconds() < 300:  # 5 minutes
-            send_local_notification(task_name, str(time_remaining))
-        
-        return f"Your next task is: {task_name} with deadline {next_task[1]}"
+         for row in reader:
+                st.write(f"Task: {row[0]}, Deadline: {row[1]}, Priority: {row[2]}")
     else:
         return "You have no upcoming tasks!"
 
