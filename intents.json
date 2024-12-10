@@ -1,5 +1,4 @@
-{
-    "intents": [
+[
         {
             "tag": "greeting",
             "patterns": [
@@ -51,4 +50,4 @@
             ]
         }
     ]
-}
+
