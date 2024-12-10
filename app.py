@@ -95,12 +95,20 @@ def send_local_notification(task_name, time_remaining):
         message=f"You have {time_remaining} left to complete this task.",
         timeout=10  # Notification duration in seconds
     )
+def get_initial_response():
+    # Look for the default or greeting tag in the JSON file
+    for intent in intents['intents']:
+        if intent['tag'] == 'default':  # Change 'default' to any tag you use for initial response
+            return intent['responses'][0]  # Return the first response from the "responses" list
+    return "Hello! How can I assist you today?" 
 
 # Function to predict user input and return response
 def chatbot(input_text):
     # Check if the input has the "by" keyword indicating a task with a deadline
     if "next task" in input_text.lower():
         task_response = get_next_task()
+        initial_response = get_initial_response()
+
         return initial_response + "\n\n" + task_response
     if " by " in input_text:  
         task_info = input_text.split(" by ")  # Split the task and deadline
