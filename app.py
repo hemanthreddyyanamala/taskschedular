@@ -60,13 +60,8 @@ def get_next_task():
     with open(TASK_FILE, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
         next(reader)  # Skip header row
-        tasks = sorted(list(reader), key=lambda x: x[1])  # Sort by deadline
-    
-    if tasks:
          for row in reader:
                 st.write(f"Task: {row[0]}, Deadline: {row[1]}, Priority: {row[2]}")
-    else:
-        return "You have no upcoming tasks!"
 
 # Function to send a local notification
 def send_local_notification(task_name, time_remaining):
