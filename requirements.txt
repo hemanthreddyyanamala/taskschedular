@@ -3,3 +3,6 @@ nltk
 plyer
 scikit-learn
 schedule
+dateparser
+datetime
+csv
