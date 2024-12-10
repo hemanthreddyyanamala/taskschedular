@@ -100,7 +100,7 @@ def chatbot(input_text):
     input_text_transformed = vectorizer.transform([input_text])
     tag = clf.predict(input_text_transformed)[0]  # Predict the intent based on the input
 
-    for intent in intents['intents']:
+    for intent in intents:
         if intent['tag'] == tag:
             if tag == "next_task":
                 return get_next_task()  # Respond with the next task
