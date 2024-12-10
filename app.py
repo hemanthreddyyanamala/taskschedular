@@ -90,7 +90,7 @@ def chatbot(input_text):
     input_text = vectorizer.transform([input_text])
     tag = clf.predict(input_text)[0]
     
-    for intent in intents['intents']:
+    for intent in intents:
         if intent['tag'] == tag:
             # Handle task management intent
             if tag == "task_management":
