@@ -97,7 +97,7 @@ def send_local_notification(task_name, time_remaining):
     )
 def get_initial_response():
     # Look for the default or greeting tag in the JSON file
-    for intent in intents['intents']:
+    for intent in intents:
         if intent['tag'] == 'default':  # Change 'default' to any tag you use for initial response
             return intent['responses'][0]  # Return the first response from the "responses" list
     return "Hello! How can I assist you today?" 
