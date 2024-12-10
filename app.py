@@ -88,6 +88,9 @@ def send_local_notification(task_name, time_remaining):
 # Function to predict user input and return response
 def chatbot(input_text):
     # Check if the input has the "by" keyword indicating a task with a deadline
+    if "next task" in input_text.lower():
+        task_response = get_next_task()
+        return initial_response + "\n\n" + task_response
     if " by " in input_text:  
         task_info = input_text.split(" by ")  # Split the task and deadline
         if len(task_info) == 2:
