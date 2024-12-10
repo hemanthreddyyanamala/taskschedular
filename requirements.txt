@@ -2,3 +2,4 @@ streamlit
 nltk
 plyer
 scikit-learn
+schedule
