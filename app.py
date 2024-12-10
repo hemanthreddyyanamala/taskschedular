@@ -9,6 +9,7 @@ import streamlit as st
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from plyer import notification
+from dateutil.parser import parse
 
 # SSL context for nltk download
 ssl._create_default_https_context = ssl._create_unverified_context
