@@ -60,8 +60,8 @@ def get_next_task():
     with open(TASK_FILE, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
         next(reader)  # Skip header row
-         for row in reader:
-                st.write(f"Task: {row[0]}, Deadline: {row[1]}, Priority: {row[2]}")
+        for row in reader:
+            st.write(f"Task: {row[0]}, Deadline: {row[1]}, Priority: {row[2]}")
 
 # Function to send a local notification
 def send_local_notification(task_name, time_remaining):
