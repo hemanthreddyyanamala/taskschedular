@@ -1,0 +1,54 @@
+{
+    "intents": [
+        {
+            "tag": "greeting",
+            "patterns": [
+                "Hi",
+                "Hello",
+                "Good morning",
+                "Good evening",
+                "Hey"
+            ],
+            "responses": [
+                "Hello! How can I assist you with your tasks today?",
+                "Hi there! What can I help you with?"
+            ]
+        },
+        {
+            "tag": "task_management",
+            "patterns": [
+                "What tasks do I have?",
+                "Show my tasks",
+                "What is my next task?"
+            ],
+            "responses": [
+                "I will show you your next task. Please hold on.",
+                "I can help you with that. Here's your upcoming task:"
+            ]
+        },
+        {
+            "tag": "goodbye",
+            "patterns": [
+                "Goodbye",
+                "Bye",
+                "See you later"
+            ],
+            "responses": [
+                "Goodbye! Have a great day ahead!",
+                "See you! Don't forget to manage your tasks!"
+            ]
+        },
+        {
+            "tag": "help",
+            "patterns": [
+                "Help",
+                "Can you assist me?",
+                "I need help"
+            ],
+            "responses": [
+                "I'm here to assist you. You can ask me about your tasks or ask for task reminders.",
+                "How can I help you with your tasks?"
+            ]
+        }
+    ]
+}
