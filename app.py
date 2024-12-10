@@ -60,8 +60,22 @@ def get_next_task():
     with open(TASK_FILE, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
         next(reader)  # Skip header row
-        for row in reader:
-            st.write(f"Task: {row[0]}, Deadline: {row[1]}, Priority: {row[2]}")
+        tasks = sorted(list(reader), key=lambda x: x[1])  # Sort by deadline
+    
+    if tasks:
+        next_task = tasks[0]  # First task is the next one to do
+        task_name = next_task[0]
+        deadline_str = next_task[1]
+        deadline = datetime.datetime.strptime(deadline_str, "%Y-%m-%d %H:%M:%S")
+        time_remaining = deadline - datetime.datetime.now()
+        
+        # Send notification if the task is due soon (within 5 minutes)
+        if time_remaining.total_seconds() < 300:  # 5 minutes
+            send_local_notification(task_name, str(time_remaining))
+        
+        return f"Your next task is: {task_name} with deadline {next_task[1]}"
+    else:
+        return "You have no upcoming tasks!"
 
 # Function to send a local notification
 def send_local_notification(task_name, time_remaining):
