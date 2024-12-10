@@ -24,7 +24,8 @@ clf = LogisticRegression(random_state=0, max_iter=10000)
 tags = []
 patterns = []
 for intent in intents:
-    for pattern in intent['patterns']:
+    patterns_list = intent.get('patterns', [])
+    for pattern in patterns_list:
         tags.append(intent['tag'])
         patterns.append(pattern)
 
