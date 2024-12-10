@@ -87,26 +87,28 @@ def send_local_notification(task_name, time_remaining):
 
 # Function to predict user input and return response
 def chatbot(input_text):
-    input_text = vectorizer.transform([input_text])
-    tag = clf.predict(input_text)[0]
-    
-    for intent in intents:
+    # Check if the input has the "by" keyword indicating a task with a deadline
+    if " by " in input_text:  
+        task_info = input_text.split(" by ")  # Split the task and deadline
+        if len(task_info) == 2:
+            task = task_info[0].strip()  # Task is everything before "by"
+            deadline = task_info[1].strip()  # Deadline is everything after "by"
+            add_task(task, deadline)  # Add the task to the task file
+            return "Task added successfully!"  # Inform the user that the task was added
+
+    # If no task information is found, process it for classification (using the vectorizer)
+    input_text_transformed = vectorizer.transform([input_text])
+    tag = clf.predict(input_text_transformed)[0]  # Predict the intent based on the input
+
+    for intent in intents['intents']:
         if intent['tag'] == tag:
-            # Handle task management intent
-            if tag == "task_management":
-                # Example: "Finish the report by 5 PM"
-                task_info = input_text.split(" by ")
-                if len(task_info) == 2:
-                    task = task_info[0]
-                    deadline = task_info[1]
-                    add_task(task, deadline)
-                    return "Task added successfully!"
-            elif tag == "next_task":
-                return get_next_task()
+            if tag == "next_task":
+                return get_next_task()  # Respond with the next task
             else:
-                return random.choice(intent['responses'])
-    
-    return "Sorry, I didn't understand that."
+                return random.choice(intent['responses'])  # Return a random response from the matched intent
+
+    return "Sorry, I didn't understand that."  # Fallback response
+
 
 def main():
     st.title("Task Management Chatbot")
