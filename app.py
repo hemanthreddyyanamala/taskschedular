@@ -15,9 +15,6 @@ import streamlit as st
 # Apply custom CSS styling to the whole page with gradient background
 
 
-
-
-
 # SSL context for nltk download
 ssl._create_default_https_context = ssl._create_unverified_context
 nltk.data.path.append(os.path.abspath("nltk_data"))
@@ -53,6 +50,7 @@ if not os.path.exists(TASK_FILE):
     with open(TASK_FILE, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(['Task', 'Deadline', 'Priority'])  # Header
+
 def get_task_priority(deadline):
     current_time = datetime.datetime.now()
     time_remaining = deadline - current_time
@@ -63,6 +61,7 @@ def get_task_priority(deadline):
         return "Medium"
     else:
         return "Low"
+
 # Function to add a task to CSV file
 def add_task(task, deadline_str, priority="Medium"):
     try:
@@ -84,8 +83,6 @@ def add_task(task, deadline_str, priority="Medium"):
         return f"Error adding task: {str(e)}"
 
 # Function to retrieve tasks sorted by deadline
-
-
 def get_next_task():
     tasks = []
     with open(TASK_FILE, 'r', encoding='utf-8') as file:
@@ -122,8 +119,6 @@ def get_next_task():
         return f"Your next task is: {task_name} with deadline {next_task[1]} and priority {priority}"
     else:
         return "You have no upcoming tasks!"
-   
-
 
 # Function to send a local notification
 def send_local_notification(task_name, time_remaining):
@@ -132,6 +127,7 @@ def send_local_notification(task_name, time_remaining):
         message=f"You have {time_remaining} left to complete this task.",
         timeout=10  # Notification duration in seconds
     )
+
 def get_initial_response():
     # Look for the default or greeting tag in the JSON file
     for intent in intents:
@@ -141,8 +137,7 @@ def get_initial_response():
 
 # Function to predict user input and return response
 def chatbot(input_text):
-    
-   # Check if the input has the "next task" keyword indicating a request for next task
+    # Check if the input has the "next task" keyword indicating a request for next task
     if "next task" in input_text.lower():
         task_response = get_next_task()
         initial_response = get_initial_response()
