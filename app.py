@@ -208,21 +208,11 @@ st.markdown("""
     <head>
         <style>
         /* Apply gradient background to the whole page */
-        body {
-            background: linear-gradient(to right, #FF7E5F, #feb47b);  /* Gradient from pink to orange */
-            color: #ffffff;  /* White text color */
-            font-family: Arial, sans-serif;  /* Set the font */
-            margin: 0;
-            padding: 0;
-            height: 100vh; /* Full viewport height */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
+       
 
         /* Styling for header text */
         h1, h2, h3, h4, h5, h6 {
+        background: linear-gradient(to right, #FF7E5F, #feb47b);
             color: #ffffff;  /* White text color for headers */
         }
 
