@@ -46,13 +46,30 @@ if not os.path.exists(TASK_FILE):
     with open(TASK_FILE, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(['Task', 'Deadline', 'Priority'])  # Header
+def get_task_priority(deadline):
+    current_time = datetime.datetime.now()
+    time_remaining = deadline - current_time
 
+    if time_remaining.total_seconds() < 86400:  # Less than 24 hours
+        return "High"
+    elif time_remaining.total_seconds() < 259200:  # Between 1 and 3 days (24*3 hours = 72 hours)
+        return "Medium"
+    else:
+        return "Low"
 # Function to add a task to CSV file
 def add_task(task, deadline, priority="Medium"):
-    task_data = [task, deadline, priority]
-    with open(TASK_FILE, 'a', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        writer.writerow(task_data)
+    try:
+        deadline = parse(deadline_str)  # Parse the deadline using dateparser
+        priority = get_task_priority(deadline)
+        task_data = [task, deadline_str, priority]
+        
+        with open(TASK_FILE, 'a', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            writer.writerow(task_data)
+        return f"Task added with {priority} priority!"  # Inform the user that the task was added
+    
+    except Exception as e:
+        return f"Error adding task: {str(e)}"
 
 # Function to retrieve tasks sorted by deadline
 
@@ -104,42 +121,33 @@ def get_initial_response():
 # Function to predict user input and return response
 def chatbot(input_text):
     
+   # Check if the input has the "next task" keyword indicating a request for next task
     if "next task" in input_text.lower():
         task_response = get_next_task()
         initial_response = get_initial_response()
         return initial_response + "\n\n" + task_response
     
-    # Check if the input has the "high-priority" keyword for high priority task
-    if "high-priority" in input_text.lower():
-        if " by " in input_text or " at " in input_text:  
-            task_info = input_text.split(" by ")  # Split the task and deadline
-            if len(task_info) == 2:
-                task = task_info[0].replace("high-priority", "").strip()  # Remove "high-priority" and extract task
-                deadline = task_info[1].strip()  # Deadline is everything after "by"
-                add_task(task, deadline, priority="High")  # Add the task with high priority
-                return "High-priority task added successfully!"  # Inform the user that the task was added
-    
-    # Check if the input has the "low-priority" keyword for low priority task
-    elif "low-priority" in input_text.lower():
-        if " by " in input_text or " at " in input_text:  
-            task_info = input_text.split(" by ")  # Split the task and deadline
-            if len(task_info) == 2:
-                task = task_info[0].replace("low-priority", "").strip()  # Remove "low-priority" and extract task
-                deadline = task_info[1].strip()  # Deadline is everything after "by"
-                add_task(task, deadline, priority="Low")  # Add the task with low priority
-                return "Low-priority task added successfully!"  # Inform the user that the task was added
-    
-    # Handle regular task addition (default priority = Medium)
+    # Handle task creation with deadline (task will automatically get priority)
     elif " by " in input_text or " at " in input_text:  
         task_info = input_text.split(" by ")  # Split the task and deadline
         if len(task_info) == 2:
             task = task_info[0].strip()  # Task is everything before "by"
             deadline = task_info[1].strip()  # Deadline is everything after "by"
-            add_task(task, deadline)  # Add the task with default medium priority
-            return "Task added successfully!"# Return a random response from the matched intent
+            task_response = add_task(task, deadline)  # Add the task with auto-priority
+            return task_response  # Inform the user that the task was added
+    
+    # If no task information is found, process it for classification (using the vectorizer)
+    input_text_transformed = vectorizer.transform([input_text])
+    tag = clf.predict(input_text_transformed)[0]  # Predict the intent based on the input
 
-    return "Sorry, I didn't understand that."  # Fallback response
+    for intent in intents:
+        if intent['tag'] == tag:
+            if tag == "next_task":
+                return get_next_task()  # Respond with the next task
+            else:
+                return random.choice(intent['responses'])  # Return a random response from the matched intent
 
+    return "Sorry, I didn't understand that."
 
 def main():
     st.title("Task Management Chatbot")
