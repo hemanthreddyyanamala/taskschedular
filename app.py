@@ -208,6 +208,9 @@ st.markdown("""
     <head>
         <style>
         /* Apply gradient background to the whole page */
+        body{
+        background: linear-gradient(to right, #FF7E5F, #feb47b);
+        }
        
 
         /* Styling for header text */
