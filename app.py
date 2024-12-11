@@ -64,14 +64,6 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Title for the app
-st.title("Task Management Chatbot")
-
-# Static content to be displayed on the whole page
-st.write("Welcome to your task management system!")
-st.write("You can add, view, and manage tasks easily.")
-st.write("The background is now a gradient, making it more visually engaging.")
-
 # Content and layout
 st.markdown("<div class='main'></div>", unsafe_allow_html=True)
 
