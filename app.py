@@ -104,6 +104,14 @@ def get_initial_response():
 
 # Function to predict user input and return response
 def chatbot(input_text):
+    if "high-priority" in input_text.lower():
+        if " by " in input_text:
+            task_info = input_text.split(" by ")
+            if len(task_info) == 2:
+                task = task_info[0].replace("high-priority", "").strip()  # Remove "high-priority" and extract task
+                deadline = task_info[1].strip()
+                add_task(task, deadline, priority="High")
+                return "High-priority task added successfully!"
     # Check if the input has the "by" keyword indicating a task with a deadline
     if "next task" in input_text.lower():
         task_response = get_next_task()
