@@ -110,6 +110,21 @@ def get_next_task():
         return f"Your next task is: {task_name} with deadline {next_task[1]} and priority {priority}"
     else:
         return "You have no upcoming tasks!"
+    if tasks:
+        next_task = tasks[0]  # First task is the next one to do
+        task_name = next_task[0]
+        deadline_str = next_task[1]
+        deadline = parse(deadline_str)  # Parse the deadline using dateparser
+        
+        time_remaining = deadline - datetime.datetime.now()
+
+        # Send notification if the task is due soon (within 5 minutes)
+        if time_remaining.total_seconds() < 300:  # 5 minutes
+            send_local_notification(task_name, str(time_remaining))
+        
+        return f"Your next task is: {task_name} with deadline {next_task[1]}"
+    else:
+        return "You have no upcoming tasks!"
 
 
 # Function to send a local notification
