@@ -46,6 +46,7 @@ if not os.path.exists(TASK_FILE):
     with open(TASK_FILE, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(['Task', 'Deadline', 'Priority'])  # Header
+
 def get_task_priority(deadline):
     current_time = datetime.datetime.now()
     time_remaining = deadline - current_time
@@ -56,24 +57,26 @@ def get_task_priority(deadline):
         return "Medium"
     else:
         return "Low"
+
 # Function to add a task to CSV file
-def add_task(task, deadline, priority="Medium"):
+def add_task(task, deadline_str, priority="Medium"):
     try:
-        deadline = parse(deadline_str)  # Parse the deadline using dateparser
+        # Parse the deadline using dateparser
+        deadline = parse(deadline_str)  
         priority = get_task_priority(deadline)
         task_data = [task, deadline_str, priority]
-        
+
+        # Save the task to the CSV file
         with open(TASK_FILE, 'a', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
             writer.writerow(task_data)
+        
         return f"Task added with {priority} priority!"  # Inform the user that the task was added
     
     except Exception as e:
         return f"Error adding task: {str(e)}"
 
 # Function to retrieve tasks sorted by deadline
-
-
 def get_next_task():
     tasks = []
     with open(TASK_FILE, 'r', encoding='utf-8') as file:
@@ -94,15 +97,22 @@ def get_next_task():
         
         time_remaining = deadline - datetime.datetime.now()
 
+        # Automatically assign priority based on the time remaining
+        if time_remaining.total_seconds() < 300:  # Less than 5 minutes
+            priority = "High"
+        elif time_remaining.total_seconds() < 86400:  # Less than 24 hours
+            priority = "Medium"
+        else:  # More than 24 hours
+            priority = "Low"
+
         # Send notification if the task is due soon (within 5 minutes)
         if time_remaining.total_seconds() < 300:  # 5 minutes
             send_local_notification(task_name, str(time_remaining))
         
-        return f"Your next task is: {task_name} with deadline {next_task[1]}"
+        # Return task information with priority
+        return f"Your next task is: {task_name} with deadline {next_task[1]} and priority {priority}"
     else:
         return "You have no upcoming tasks!"
-
-
 
 # Function to send a local notification
 def send_local_notification(task_name, time_remaining):
@@ -111,6 +121,7 @@ def send_local_notification(task_name, time_remaining):
         message=f"You have {time_remaining} left to complete this task.",
         timeout=10  # Notification duration in seconds
     )
+
 def get_initial_response():
     # Look for the default or greeting tag in the JSON file
     for intent in intents:
@@ -120,8 +131,7 @@ def get_initial_response():
 
 # Function to predict user input and return response
 def chatbot(input_text):
-    
-   # Check if the input has the "next task" keyword indicating a request for next task
+    # Check if the input has the "next task" keyword indicating a request for next task
     if "next task" in input_text.lower():
         task_response = get_next_task()
         initial_response = get_initial_response()
@@ -179,6 +189,3 @@ def main():
         You can input your tasks along with deadlines, and it will keep track of them.
         When you ask, it will tell you your next task to do.
         """)
-
-if __name__ == "__main__":
-    main()
