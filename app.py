@@ -89,15 +89,8 @@ def get_next_task():
     with open(TASK_FILE, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
         next(reader)
-        for row in reader:
-            try:
-                # Try to parse the deadline (row[1])
-                deadline = parse(row[1])
-                tasks.append(row)
-            except ParserError:
-                print(f"Error parsing date: {row[1]}")  # Log error for invalid deadline format
-                continue  # Skip the invalid task# Skip header row
-        tasks = sorted(list(reader), key=lambda x: parse(x[1]))  # Sort by deadline using dateparser.parse
+         # Skip the invalid task# Skip header row
+    tasks = sorted(list(reader), key=lambda x: parse(x[1]))  # Sort by deadline using dateparser.parse
             
     if tasks:
         next_task = tasks[0]  # First task is the next one to do
