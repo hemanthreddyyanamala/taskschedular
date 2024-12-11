@@ -15,8 +15,7 @@ import streamlit as st
 # Apply custom CSS styling to the whole page with gradient background
 
 
-# Content and layout
-st.markdown("<div class='main'></div>", unsafe_allow_html=True)
+
 
 
 # SSL context for nltk download
