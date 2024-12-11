@@ -129,18 +129,20 @@ def get_initial_response():
 def chatbot(input_text):
     
    # Check if the input has the "next task" keyword indicating a request for next task
-    if "next task" in input_text.lower():
+    if "next task" in input_text.lower() or "tasks" in input_text.lower():
         task_response = get_next_task()
         initial_response = get_initial_response()
         return initial_response + "\n\n" + task_response
     
-    # Handle task creation with deadline (task will automatically get priority)
-    elif " by " in input_text or " at " in input_text:  
-        task_info = input_text.split(" by ")  # Split the task and deadline
+    elif  " by " in input_text or " at " in input_text:
+        if " at " in input_text:
+            task_info = input_text.split(" at ")
+        if " by " in input_text:
+            task_info = input_text.split(" by ")
         if len(task_info) == 2:
-            task = task_info[0].strip()  # Task is everything before "by"
-            deadline = task_info[1].strip()  # Deadline is everything after "by"
-            task_response = add_task(task, deadline)  # Add the task with auto-priority
+            task = task_info[0].strip()
+            deadline = task_info[1].strip()
+            task_response = add_task(task, deadline)
             return task_response  # Inform the user that the task was added
     
     # If no task information is found, process it for classification (using the vectorizer)
