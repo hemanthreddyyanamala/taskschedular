@@ -142,7 +142,7 @@ def chatbot(input_text):
             deadline = task_info[1].strip()  # Deadline is everything after "by"
             task_response = add_task(task, deadline)  # Add the task with auto-priority
             return task_response  # Inform the user that the task was added
-     input_text_transformed = vectorizer.transform([input_text])
+    input_text_transformed = vectorizer.transform([input_text])
     tag = clf.predict(input_text_transformed)[0]  # Predict the intent based on the input
 
     for intent in intents:
