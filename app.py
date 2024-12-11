@@ -199,46 +199,6 @@ def main():
         When you ask, it will tell you your next task to do.
         """)
 
-# Embed the full HTML with gradient background and content
-import streamlit as st
-
-# Embed the full HTML with gradient background and content
-st.markdown("""
-    <html>
-    <head>
-        <style>
-        /* Apply gradient background to the whole page */
-        html{
-        background: linear-gradient(to right, #FF7E5F, #feb47b);
-        }
-       
-
-        /* Styling for header text */
-        h1, h2, h3, h4, h5, h6 {
-        background: linear-gradient(to right, #FF7E5F, #feb47b);
-            color: #ffffff;  /* White text color for headers */
-        }
-
-        /* Styling for paragraphs */
-        p {
-            font-size: 18px;
-            text-align: center;
-            margin: 10px;
-        }
-
-        /* Customize buttons */
-        .stButton>button {
-            background-color: #FF6347;  /* Tomato color for buttons */
-            color: white;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-size: 14px;
-        }
-
-        </style>
-    </head>
-    </html>
-    """, unsafe_allow_html=True)
 
 
 
