@@ -10,6 +10,69 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from plyer import notification
 from dateutil.parser import parse
+import streamlit as st
+
+# Apply custom CSS styling to the whole page
+st.markdown("""
+    <style>
+    /* Apply background color to the whole page */
+    body {
+        background-color: #f0f2f6;  /* Light gray background */
+        color: #333333;  /* Text color */
+        font-family: Arial, sans-serif;  /* Set the font */
+    }
+
+    /* Styling the main title */
+    h1, h2, h3, h4, h5, h6 {
+        color: #2e3d49;  /* Dark text color for headers */
+    }
+
+    /* Customize text input field */
+    .stTextInput>div>div>input {
+        border-radius: 8px;
+        background-color: #ffffff;
+        padding: 10px;
+    }
+
+    /* Customize text area field */
+    .stTextArea>div>div>textarea {
+        border-radius: 8px;
+        background-color: #ffffff;
+        padding: 10px;
+    }
+
+    /* Customize buttons */
+    .stButton>button {
+        background-color: #FF6347;  /* Tomato color for buttons */
+        color: white;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+
+    /* Center the content */
+    .main {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+    }
+
+    </style>
+    """, unsafe_allow_html=True)
+
+# Title for the app
+st.title("Task Management Chatbot")
+
+# Static content to be displayed on the whole page
+st.write("Welcome to your task management system!")
+st.write("You can add, view, and manage tasks easily.")
+st.write("The background and UI elements are customized for a cleaner look.")
+
+# Content and layout
+st.markdown("<div class='main'></div>", unsafe_allow_html=True)
+
 
 # SSL context for nltk download
 ssl._create_default_https_context = ssl._create_unverified_context
