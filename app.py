@@ -147,7 +147,7 @@ def chatbot(input_text):
         return initial_response + "\n\n" + task_response
     
     # Handle task creation with deadline (task will automatically get priority)
-    elif " by " in input_text or " at " in input_text:  
+    elif " by " in input_text or " at " in input_text or " tomorrow " in input_text:  
         task_info = input_text.split(" by ")  # Split the task and deadline
         if len(task_info) == 2:
             task = task_info[0].strip()  # Task is everything before "by"
