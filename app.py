@@ -64,7 +64,7 @@ def add_task(task, deadline_str, priority="Medium"):
         elif deadline_str.lower() == "tomorrow":
             deadline = datetime.datetime.now() + datetime.timedelta(days=1)
         else:
-        deadline = parse(deadline_str)  # Parse the deadline using dateparser
+            deadline = parse(deadline_str)  # Parse the deadline using dateparser
         priority = get_task_priority(deadline)
         task_data = [task, deadline_str, priority]
         
