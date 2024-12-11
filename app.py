@@ -88,35 +88,39 @@ def get_next_task():
     tasks = []
     with open(TASK_FILE, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
-        next(reader)
-         # Skip the invalid task# Skip header row
-    tasks = sorted(list(reader), key=lambda x: parse(x[1]))  # Sort by deadline using dateparser.parse
-            
+        next(reader)  # Skip header row
+        for row in reader:
+            try:
+                # Parse and sort tasks
+                deadline = parse(row[1])
+                tasks.append(row)
+            except Exception as e:
+                print(f"Error parsing date: {row[1]}, skipping task.")
+                continue  # Skip invalid task
+
+    # Sorting tasks after the file is closed
+    tasks = sorted(tasks, key=lambda x: parse(x[1]))
+    
     if tasks:
-        next_task = tasks[0]  # First task is the next one to do
+        next_task = tasks[0]
         task_name = next_task[0]
         deadline_str = next_task[1]
         
-        # Parse the deadline using dateparser instead of datetime.strptime
-        deadline = parse(deadline_str)  # This can handle formats like "Friday at 2 PM"
-        
-        if deadline is None:
-            return "Sorry, I couldn't understand the deadline format."
-        
+        # Parse the deadline
+        deadline = parse(deadline_str)
         time_remaining = deadline - datetime.datetime.now()
 
-        # Automatically assign priority based on the time remaining
-        priority=get_task_priority(deadline)
+        # Automatically assign priority based on time remaining
+        priority = get_task_priority(deadline)
 
-        # Send notification if the task is due soon (within 5 minutes)
-        if time_remaining.total_seconds() < 300:  # 5 minutes
+        # Notify user if task is due soon
+        if time_remaining.total_seconds() < 300:
             send_local_notification(task_name, str(time_remaining))
-        
-        # Return task information with priority
-        return f"Your next task is: {task_name} with deadline {next_task[1]} and priority {priority}"
+
+        return f"Your next task is: {task_name} with deadline {deadline_str} and priority {priority}"
     else:
         return "You have no upcoming tasks!"
-   
+
 
 
 # Function to send a local notification
