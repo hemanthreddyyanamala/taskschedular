@@ -12,19 +12,21 @@ from plyer import notification
 from dateutil.parser import parse
 import streamlit as st
 
-# Apply custom CSS styling to the whole page
+# Apply custom CSS styling to the whole page with gradient background
 st.markdown("""
     <style>
-    /* Apply background color to the whole page */
+    /* Apply gradient background to the whole page */
     body {
-        background-color: #f0f2f6;  /* Light gray background */
-        color: #333333;  /* Text color */
+        background: linear-gradient(to right, #FF7E5F, #feb47b);  /* Gradient from pink to orange */
+        color: #ffffff;  /* White text color */
         font-family: Arial, sans-serif;  /* Set the font */
+        margin: 0;
+        padding: 0;
     }
 
-    /* Styling the main title */
+    /* Styling for header text */
     h1, h2, h3, h4, h5, h6 {
-        color: #2e3d49;  /* Dark text color for headers */
+        color: #ffffff;  /* White text color for headers */
     }
 
     /* Customize text input field */
@@ -68,7 +70,7 @@ st.title("Task Management Chatbot")
 # Static content to be displayed on the whole page
 st.write("Welcome to your task management system!")
 st.write("You can add, view, and manage tasks easily.")
-st.write("The background and UI elements are customized for a cleaner look.")
+st.write("The background is now a gradient, making it more visually engaging.")
 
 # Content and layout
 st.markdown("<div class='main'></div>", unsafe_allow_html=True)
