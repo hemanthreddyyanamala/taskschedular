@@ -11,6 +11,7 @@ from sklearn.linear_model import LogisticRegression
 from plyer import notification
 from dateutil.parser import parse
 
+TASK_FILE = "tasks.csv"
 # SSL context for nltk download
 ssl._create_default_https_context = ssl._create_unverified_context
 nltk.data.path.append(os.path.abspath("nltk_data"))
