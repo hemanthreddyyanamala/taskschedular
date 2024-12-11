@@ -93,14 +93,8 @@ def get_next_task():
             return "Sorry, I couldn't understand the deadline format."
         
         time_remaining = deadline - datetime.datetime.now()
-
+        priority=get_task_priority(deadline)
         # Automatically assign priority based on the time remaining
-        if time_remaining.total_seconds() < 300:  # Less than 5 minutes
-            priority = "High"
-        elif time_remaining.total_seconds() < 86400:  # Less than 24 hours
-            priority = "Medium"
-        else:  # More than 24 hours
-            priority = "Low"
 
         # Send notification if the task is due soon (within 5 minutes)
         if time_remaining.total_seconds() < 300:  # 5 minutes
