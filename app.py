@@ -10,10 +10,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from plyer import notification
 from dateutil.parser import parse
-import streamlit as st
-
-# Apply custom CSS styling to the whole page with gradient background
-
 
 # SSL context for nltk download
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -21,9 +17,11 @@ nltk.data.path.append(os.path.abspath("nltk_data"))
 nltk.download('punkt')
 
 # Load intents from the JSON file
-file_path = os.path.abspath("./intents.json")
-with open(file_path, "r") as file:
-    intents = json.load(file)
+if not os.path.exists(TASK_FILE):
+    with open(TASK_FILE, 'w', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Task', 'Deadline', 'Priority'])  # Header
+
 
 # Initialize vectorizer and classifier
 vectorizer = TfidfVectorizer(ngram_range=(1, 4))
@@ -65,18 +63,16 @@ def get_task_priority(deadline):
 # Function to add a task to CSV file
 def add_task(task, deadline_str, priority="Medium"):
     try:
-        if "today" in deadline_str.lower():
-            deadline = datetime.datetime.now()  # Use current date and time
-        elif "tomorrow" in deadline_str.lower():
-            deadline = datetime.datetime.now() + datetime.timedelta(days=1)
-        else:
-            deadline = parse(deadline_str)  # Parse the deadline using dateparser
+        # Parse the deadline using dateparser
+        deadline = parse(deadline_str)  
         priority = get_task_priority(deadline)
         task_data = [task, deadline_str, priority]
-        
+
+        # Save the task to the CSV file
         with open(TASK_FILE, 'a', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
             writer.writerow(task_data)
+        
         return f"Task added with {priority} priority!"  # Inform the user that the task was added
     
     except Exception as e:
@@ -195,6 +191,3 @@ def main():
         You can input your tasks along with deadlines, and it will keep track of them.
         When you ask, it will tell you your next task to do.
         """)
-
-if __name__ == "__main__":
-    main()
