@@ -129,7 +129,7 @@ def get_initial_response():
 def chatbot(input_text):
     
    # Check if the input has the "next task" keyword indicating a request for next task
-    if "next task" in input_text.lower() or "task" in input_text.lower():
+    if "next task" in input_text.lower() or "tasks" in input_text.lower():
         task_response = get_next_task()
         initial_response = get_initial_response()
         return initial_response + "\n\n" + task_response
