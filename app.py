@@ -48,8 +48,7 @@ if not os.path.exists(TASK_FILE):
         writer.writerow(['Task', 'Deadline', 'Priority'])  # Header
 
 # Function to add a task to CSV file
-def add_task(task, deadline):
-    priority = "Medium"  # Default priority
+def add_task(task, deadline, priority="Medium"):
     task_data = [task, deadline, priority]
     with open(TASK_FILE, 'a', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
@@ -104,38 +103,40 @@ def get_initial_response():
 
 # Function to predict user input and return response
 def chatbot(input_text):
-    if "high-priority" in input_text.lower():
-        if " by " in input_text:
-            task_info = input_text.split(" by ")
-            if len(task_info) == 2:
-                task = task_info[0].replace("high-priority", "").strip()  # Remove "high-priority" and extract task
-                deadline = task_info[1].strip()
-                add_task(task, deadline, priority="High")
-                return "High-priority task added successfully!"
-    # Check if the input has the "by" keyword indicating a task with a deadline
+    
     if "next task" in input_text.lower():
         task_response = get_next_task()
         initial_response = get_initial_response()
-
         return initial_response + "\n\n" + task_response
-    if " by " in input_text:  
+    
+    # Check if the input has the "high-priority" keyword for high priority task
+    if "high-priority" in input_text.lower():
+        if " by " in input_text or " at " in input_text:  
+            task_info = input_text.split(" by ")  # Split the task and deadline
+            if len(task_info) == 2:
+                task = task_info[0].replace("high-priority", "").strip()  # Remove "high-priority" and extract task
+                deadline = task_info[1].strip()  # Deadline is everything after "by"
+                add_task(task, deadline, priority="High")  # Add the task with high priority
+                return "High-priority task added successfully!"  # Inform the user that the task was added
+    
+    # Check if the input has the "low-priority" keyword for low priority task
+    elif "low-priority" in input_text.lower():
+        if " by " in input_text or " at " in input_text:  
+            task_info = input_text.split(" by ")  # Split the task and deadline
+            if len(task_info) == 2:
+                task = task_info[0].replace("low-priority", "").strip()  # Remove "low-priority" and extract task
+                deadline = task_info[1].strip()  # Deadline is everything after "by"
+                add_task(task, deadline, priority="Low")  # Add the task with low priority
+                return "Low-priority task added successfully!"  # Inform the user that the task was added
+    
+    # Handle regular task addition (default priority = Medium)
+    elif " by " in input_text or " at " in input_text:  
         task_info = input_text.split(" by ")  # Split the task and deadline
         if len(task_info) == 2:
             task = task_info[0].strip()  # Task is everything before "by"
             deadline = task_info[1].strip()  # Deadline is everything after "by"
-            add_task(task, deadline)  # Add the task to the task file
-            return "Task added successfully!"  # Inform the user that the task was added
-
-    # If no task information is found, process it for classification (using the vectorizer)
-    input_text_transformed = vectorizer.transform([input_text])
-    tag = clf.predict(input_text_transformed)[0]  # Predict the intent based on the input
-
-    for intent in intents:
-        if intent['tag'] == tag:
-            if tag == "next_task":
-                return get_next_task()  # Respond with the next task
-            else:
-                return random.choice(intent['responses'])  # Return a random response from the matched intent
+            add_task(task, deadline)  # Add the task with default medium priority
+            return "Task added successfully!"# Return a random response from the matched intent
 
     return "Sorry, I didn't understand that."  # Fallback response
 
