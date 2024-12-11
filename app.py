@@ -200,7 +200,7 @@ def main():
         """)
 
 # Embed the full HTML with gradient background and content
-    st.markdown("""
+st.markdown("""
     <html>
     <head>
         <style>
