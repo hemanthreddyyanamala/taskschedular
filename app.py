@@ -64,22 +64,25 @@ def get_task_priority(deadline):
 # Function to add a task to CSV file
 def add_task(task, deadline_str, priority="Medium"):
     try:
+        # Parse the deadline using conditional logic
         if "today" in deadline_str.lower():
-            deadline = datetime.datetime.now()  # Use current date and time
+            deadline = datetime.datetime.now()
         elif "tomorrow" in deadline_str.lower():
             deadline = datetime.datetime.now() + datetime.timedelta(days=1)
         else:
-            deadline = parse(deadline_str)  # Parse the deadline using dateparser
+            deadline = parse(deadline_str)  # Use dateparser to parse the date
+
+        # Automatically assign priority based on deadline
         priority = get_task_priority(deadline)
-        task_data = [task, deadline_str, priority]
         
+        task_data = [task, deadline_str, priority]
         with open(TASK_FILE, 'a', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
             writer.writerow(task_data)
-        return f"Task added with {priority} priority!"  # Inform the user that the task was added
-    
+        return f"Task added with {priority} priority!"  # Return success message
     except Exception as e:
-        return f"Error adding task: {str(e)}"
+        return f"Error adding task: {str(e)}"  # Return error message
+
 
 # Function to retrieve tasks sorted by deadline
 
