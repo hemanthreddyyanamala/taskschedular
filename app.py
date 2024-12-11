@@ -127,15 +127,7 @@ def get_initial_response():
 
 # Function to predict user input and return response
 def chatbot(input_text):
-    input_text_transformed = vectorizer.transform([input_text])
-    tag = clf.predict(input_text_transformed)[0]  # Predict the intent based on the input
-
-    for intent in intents:
-        if intent['tag'] == tag:
-            if tag == "next_task":
-                return get_next_task()  # Respond with the next task
-            else:
-                return random.choice(intent['responses'])  
+     
    # Check if the input has the "next task" keyword indicating a request for next task
     if "next task" in input_text.lower() or "tasks" in input_text.lower():
         task_response = get_next_task()
@@ -150,6 +142,15 @@ def chatbot(input_text):
             deadline = task_info[1].strip()  # Deadline is everything after "by"
             task_response = add_task(task, deadline)  # Add the task with auto-priority
             return task_response  # Inform the user that the task was added
+     input_text_transformed = vectorizer.transform([input_text])
+    tag = clf.predict(input_text_transformed)[0]  # Predict the intent based on the input
+
+    for intent in intents:
+        if intent['tag'] == tag:
+            if tag == "next_task":
+                return get_next_task()  # Respond with the next task
+            else:
+                return random.choice(intent['responses'])
     
     # If no task information is found, process it for classification (using the vectorizer)
     # Return a random response from the matched intent
