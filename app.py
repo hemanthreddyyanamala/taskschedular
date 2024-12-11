@@ -198,56 +198,63 @@ def main():
         You can input your tasks along with deadlines, and it will keep track of them.
         When you ask, it will tell you your next task to do.
         """)
-        st.markdown("""
-    <style>
-    /* Apply gradient background to the whole page */
-    body {
-        background: linear-gradient(to right, #FF7E5F, #feb47b);  /* Gradient from pink to orange */
-        color: #ffffff;  /* White text color */
-        font-family: Arial, sans-serif;  /* Set the font */
-        margin: 0;
-        padding: 0;
-    }
+       import streamlit as st
 
-    /* Styling for header text */
-    h1, h2, h3, h4, h5, h6 {
-        color: #ffffff;  /* White text color for headers */
-    }
+# Embed the full HTML with gradient background and content
+st.markdown("""
+    <html>
+    <head>
+        <style>
+        /* Apply gradient background to the whole page */
+        body {
+            background: linear-gradient(to right, #FF7E5F, #feb47b);  /* Gradient from pink to orange */
+            color: #ffffff;  /* White text color */
+            font-family: Arial, sans-serif;  /* Set the font */
+            margin: 0;
+            padding: 0;
+            height: 100vh; /* Full viewport height */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
 
-    /* Customize text input field */
-    .stTextInput>div>div>input {
-        border-radius: 8px;
-        background-color: #ffffff;
-        padding: 10px;
-    }
+        /* Styling for header text */
+        h1, h2, h3, h4, h5, h6 {
+            color: #ffffff;  /* White text color for headers */
+        }
 
-    /* Customize text area field */
-    .stTextArea>div>div>textarea {
-        border-radius: 8px;
-        background-color: #ffffff;
-        padding: 10px;
-    }
+        /* Styling for paragraphs */
+        p {
+            font-size: 18px;
+            text-align: center;
+            margin: 10px;
+        }
 
-    /* Customize buttons */
-    .stButton>button {
-        background-color: #FF6347;  /* Tomato color for buttons */
-        color: white;
-        border-radius: 8px;
-        padding: 10px 20px;
-        font-size: 14px;
-    }
+        /* Customize buttons */
+        .stButton>button {
+            background-color: #FF6347;  /* Tomato color for buttons */
+            color: white;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
 
-    /* Center the content */
-    .main {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        flex-direction: column;
-    }
+        </style>
+    </head>
+    <body>
 
-    </style>
+        <!-- Main content -->
+        <div>
+            <h1>Task Management Chatbot</h1>
+            <p>Welcome to your task management system! You can add, view, and manage tasks easily.</p>
+            <p>The background is now a gradient, making it more visually engaging.</p>
+        </div>
+
+    </body>
+    </html>
     """, unsafe_allow_html=True)
+
 
 
 if __name__ == "__main__":
