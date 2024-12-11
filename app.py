@@ -59,12 +59,7 @@ def get_task_priority(deadline):
 # Function to add a task to CSV file
 def add_task(task, deadline_str, priority="Medium"):
     try:
-        if "today" in deadline_str.lower():
-            deadline = datetime.datetime.now() 
-        elif "today" in deadline_str.lower():
-            deadline = datetime.datetime.now() + datetime.timedelta(days=1)
-        else:
-            deadline = parse(deadline_str)  # Parse the deadline using dateparser
+        deadline = parse(deadline_str)  # Parse the deadline using dateparser
         priority = get_task_priority(deadline)
         task_data = [task, deadline_str, priority]
         
@@ -98,8 +93,14 @@ def get_next_task():
             return "Sorry, I couldn't understand the deadline format."
         
         time_remaining = deadline - datetime.datetime.now()
-        priority=get_task_priority(deadline)
+
         # Automatically assign priority based on the time remaining
+        if time_remaining.total_seconds() < 300:  # Less than 5 minutes
+            priority = "High"
+        elif time_remaining.total_seconds() < 86400:  # Less than 24 hours
+            priority = "Medium"
+        else:  # More than 24 hours
+            priority = "Low"
 
         # Send notification if the task is due soon (within 5 minutes)
         if time_remaining.total_seconds() < 300:  # 5 minutes
@@ -127,9 +128,9 @@ def get_initial_response():
 
 # Function to predict user input and return response
 def chatbot(input_text):
-     
+    
    # Check if the input has the "next task" keyword indicating a request for next task
-    if "next task" in input_text.lower() or "tasks" in input_text.lower():
+    if "next task" in input_text.lower():
         task_response = get_next_task()
         initial_response = get_initial_response()
         return initial_response + "\n\n" + task_response
@@ -142,6 +143,8 @@ def chatbot(input_text):
             deadline = task_info[1].strip()  # Deadline is everything after "by"
             task_response = add_task(task, deadline)  # Add the task with auto-priority
             return task_response  # Inform the user that the task was added
+    
+    # If no task information is found, process it for classification (using the vectorizer)
     input_text_transformed = vectorizer.transform([input_text])
     tag = clf.predict(input_text_transformed)[0]  # Predict the intent based on the input
 
@@ -150,10 +153,7 @@ def chatbot(input_text):
             if tag == "next_task":
                 return get_next_task()  # Respond with the next task
             else:
-                return random.choice(intent['responses'])
-    
-    # If no task information is found, process it for classification (using the vectorizer)
-    # Return a random response from the matched intent
+                return random.choice(intent['responses'])  # Return a random response from the matched intent
 
     return "Sorry, I didn't understand that."
 
