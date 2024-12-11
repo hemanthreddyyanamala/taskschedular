@@ -198,10 +198,9 @@ def main():
         You can input your tasks along with deadlines, and it will keep track of them.
         When you ask, it will tell you your next task to do.
         """)
-       import streamlit as st
 
 # Embed the full HTML with gradient background and content
-st.markdown("""
+    st.markdown("""
     <html>
     <head>
         <style>
