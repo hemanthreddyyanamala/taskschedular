@@ -200,6 +200,9 @@ def main():
         """)
 
 # Embed the full HTML with gradient background and content
+import streamlit as st
+
+# Embed the full HTML with gradient background and content
 st.markdown("""
     <html>
     <head>
@@ -241,18 +244,9 @@ st.markdown("""
 
         </style>
     </head>
-    <body>
-
-        <!-- Main content -->
-        <div>
-            <h1>Task Management Chatbot</h1>
-            <p>Welcome to your task management system! You can add, view, and manage tasks easily.</p>
-            <p>The background is now a gradient, making it more visually engaging.</p>
-        </div>
-
-    </body>
     </html>
     """, unsafe_allow_html=True)
+
 
 
 
