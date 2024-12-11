@@ -17,9 +17,11 @@ nltk.data.path.append(os.path.abspath("nltk_data"))
 nltk.download('punkt')
 
 # Load intents from the JSON file
-file_path = os.path.abspath("./intents.json")
-with open(file_path, "r") as file:
-    intents = json.load(file)
+if not os.path.exists(TASK_FILE):
+    with open(TASK_FILE, 'w', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Task', 'Deadline', 'Priority'])  # Header
+
 
 # Initialize vectorizer and classifier
 vectorizer = TfidfVectorizer(ngram_range=(1, 4))
