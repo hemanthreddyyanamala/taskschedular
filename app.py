@@ -208,7 +208,7 @@ st.markdown("""
     <head>
         <style>
         /* Apply gradient background to the whole page */
-        body{
+        html{
         background: linear-gradient(to right, #FF7E5F, #feb47b);
         }
        
