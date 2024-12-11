@@ -57,7 +57,7 @@ def get_task_priority(deadline):
     else:
         return "Low"
 # Function to add a task to CSV file
-def add_task(task, dead_line, priority="Medium"):
+def add_task(task, deadline_str, priority="Medium"):
     try:
         deadline = parse(deadline_str)  # Parse the deadline using dateparser
         priority = get_task_priority(deadline)
