@@ -10,62 +10,10 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from plyer import notification
 from dateutil.parser import parse
-import streamlit as st
+
 
 # Apply custom CSS styling to the whole page with gradient background
-st.markdown("""
-    <style>
-    /* Apply gradient background to the whole page */
-    body {
-        background: linear-gradient(to right, #FF7E5F, #feb47b);  /* Gradient from pink to orange */
-        color: #ffffff;  /* White text color */
-        font-family: Arial, sans-serif;  /* Set the font */
-        margin: 0;
-        padding: 0;
-    }
 
-    /* Styling for header text */
-    h1, h2, h3, h4, h5, h6 {
-        color: #ffffff;  /* White text color for headers */
-    }
-
-    /* Customize text input field */
-    .stTextInput>div>div>input {
-        border-radius: 8px;
-        background-color: #ffffff;
-        padding: 10px;
-    }
-
-    /* Customize text area field */
-    .stTextArea>div>div>textarea {
-        border-radius: 8px;
-        background-color: #ffffff;
-        padding: 10px;
-    }
-
-    /* Customize buttons */
-    .stButton>button {
-        background-color: #FF6347;  /* Tomato color for buttons */
-        color: white;
-        border-radius: 8px;
-        padding: 10px 20px;
-        font-size: 14px;
-    }
-
-    /* Center the content */
-    .main {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        flex-direction: column;
-    }
-
-    </style>
-    """, unsafe_allow_html=True)
-
-# Content and layout
-st.markdown("<div class='main'></div>", unsafe_allow_html=True)
 
 
 # SSL context for nltk download
@@ -250,6 +198,57 @@ def main():
         You can input your tasks along with deadlines, and it will keep track of them.
         When you ask, it will tell you your next task to do.
         """)
+        st.markdown("""
+    <style>
+    /* Apply gradient background to the whole page */
+    body {
+        background: linear-gradient(to right, #FF7E5F, #feb47b);  /* Gradient from pink to orange */
+        color: #ffffff;  /* White text color */
+        font-family: Arial, sans-serif;  /* Set the font */
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Styling for header text */
+    h1, h2, h3, h4, h5, h6 {
+        color: #ffffff;  /* White text color for headers */
+    }
+
+    /* Customize text input field */
+    .stTextInput>div>div>input {
+        border-radius: 8px;
+        background-color: #ffffff;
+        padding: 10px;
+    }
+
+    /* Customize text area field */
+    .stTextArea>div>div>textarea {
+        border-radius: 8px;
+        background-color: #ffffff;
+        padding: 10px;
+    }
+
+    /* Customize buttons */
+    .stButton>button {
+        background-color: #FF6347;  /* Tomato color for buttons */
+        color: white;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+
+    /* Center the content */
+    .main {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+    }
+
+    </style>
+    """, unsafe_allow_html=True)
+
 
 if __name__ == "__main__":
     main()
