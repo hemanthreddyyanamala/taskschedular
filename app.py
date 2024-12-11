@@ -10,10 +10,62 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from plyer import notification
 from dateutil.parser import parse
-
+import streamlit as st
 
 # Apply custom CSS styling to the whole page with gradient background
+st.markdown("""
+    <style>
+    /* Apply gradient background to the whole page */
+    body {
+        background: linear-gradient(to right, #FF7E5F, #feb47b);  /* Gradient from pink to orange */
+        color: #ffffff;  /* White text color */
+        font-family: Arial, sans-serif;  /* Set the font */
+        margin: 0;
+        padding: 0;
+    }
 
+    /* Styling for header text */
+    h1, h2, h3, h4, h5, h6 {
+        color: #ffffff;  /* White text color for headers */
+    }
+
+    /* Customize text input field */
+    .stTextInput>div>div>input {
+        border-radius: 8px;
+        background-color: #ffffff;
+        padding: 10px;
+    }
+
+    /* Customize text area field */
+    .stTextArea>div>div>textarea {
+        border-radius: 8px;
+        background-color: #ffffff;
+        padding: 10px;
+    }
+
+    /* Customize buttons */
+    .stButton>button {
+        background-color: #FF6347;  /* Tomato color for buttons */
+        color: white;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+
+    /* Center the content */
+    .main {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+    }
+
+    </style>
+    """, unsafe_allow_html=True)
+
+# Content and layout
+st.markdown("<div class='main'></div>", unsafe_allow_html=True)
 
 
 # SSL context for nltk download
@@ -64,25 +116,22 @@ def get_task_priority(deadline):
 # Function to add a task to CSV file
 def add_task(task, deadline_str, priority="Medium"):
     try:
-        # Parse the deadline using conditional logic
         if "today" in deadline_str.lower():
-            deadline = datetime.datetime.now()
+            deadline = datetime.datetime.now()  # Use current date and time
         elif "tomorrow" in deadline_str.lower():
             deadline = datetime.datetime.now() + datetime.timedelta(days=1)
         else:
-            deadline = parse(deadline_str)  # Use dateparser to parse the date
-
-        # Automatically assign priority based on deadline
+            deadline = parse(deadline_str)  # Parse the deadline using dateparser
         priority = get_task_priority(deadline)
-        
         task_data = [task, deadline_str, priority]
+        
         with open(TASK_FILE, 'a', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
             writer.writerow(task_data)
-        return f"Task added with {priority} priority!"  # Return success message
+        return f"Task added with {priority} priority!"  # Inform the user that the task was added
+    
     except Exception as e:
-        return f"Error adding task: {str(e)}"  # Return error message
-
+        return f"Error adding task: {str(e)}"
 
 # Function to retrieve tasks sorted by deadline
 
@@ -92,38 +141,38 @@ def get_next_task():
     with open(TASK_FILE, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
         next(reader)  # Skip header row
-        for row in reader:
-            try:
-                # Parse and sort tasks
-                deadline = parse(row[1])
-                tasks.append(row)
-            except Exception as e:
-                print(f"Error parsing date: {row[1]}, skipping task.")
-                continue  # Skip invalid task
-
-    # Sorting tasks after the file is closed
-    tasks = sorted(tasks, key=lambda x: parse(x[1]))
+        tasks = sorted(list(reader), key=lambda x: parse(x[1]))  # Sort by deadline using dateparser.parse
     
     if tasks:
-        next_task = tasks[0]
+        next_task = tasks[0]  # First task is the next one to do
         task_name = next_task[0]
         deadline_str = next_task[1]
         
-        # Parse the deadline
-        deadline = parse(deadline_str)
+        # Parse the deadline using dateparser instead of datetime.strptime
+        deadline = parse(deadline_str)  # This can handle formats like "Friday at 2 PM"
+        
+        if deadline is None:
+            return "Sorry, I couldn't understand the deadline format."
+        
         time_remaining = deadline - datetime.datetime.now()
 
-        # Automatically assign priority based on time remaining
-        priority = get_task_priority(deadline)
+        # Automatically assign priority based on the time remaining
+        if time_remaining.total_seconds() < 300:  # Less than 5 minutes
+            priority = "High"
+        elif time_remaining.total_seconds() < 86400:  # Less than 24 hours
+            priority = "Medium"
+        else:  # More than 24 hours
+            priority = "Low"
 
-        # Notify user if task is due soon
-        if time_remaining.total_seconds() < 300:
+        # Send notification if the task is due soon (within 5 minutes)
+        if time_remaining.total_seconds() < 300:  # 5 minutes
             send_local_notification(task_name, str(time_remaining))
-
-        return f"Your next task is: {task_name} with deadline {deadline_str} and priority {priority}"
+        
+        # Return task information with priority
+        return f"Your next task is: {task_name} with deadline {next_task[1]} and priority {priority}"
     else:
         return "You have no upcoming tasks!"
-
+   
 
 
 # Function to send a local notification
@@ -144,17 +193,14 @@ def get_initial_response():
 def chatbot(input_text):
     
    # Check if the input has the "next task" keyword indicating a request for next task
-    if "next task" in input_text.lower() or "tasks" in input_text.lower():
+    if "next task" in input_text.lower():
         task_response = get_next_task()
         initial_response = get_initial_response()
         return initial_response + "\n\n" + task_response
     
     # Handle task creation with deadline (task will automatically get priority)
-    elif  " by " in input_text or " at " in input_text:
-        if " at " in input_text:# Split the task and deadline
-            task_info = input_text.split(" at ")
-        if " by " in input_text:
-            task_info = input_text.split(" by ")
+    elif " by " in input_text or " at " in input_text:  
+        task_info = input_text.split(" by ")  # Split the task and deadline
         if len(task_info) == 2:
             task = task_info[0].strip()  # Task is everything before "by"
             deadline = task_info[1].strip()  # Deadline is everything after "by"
@@ -204,10 +250,6 @@ def main():
         You can input your tasks along with deadlines, and it will keep track of them.
         When you ask, it will tell you your next task to do.
         """)
-
-
-
-
 
 if __name__ == "__main__":
     main()
