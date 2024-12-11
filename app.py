@@ -17,11 +17,9 @@ nltk.data.path.append(os.path.abspath("nltk_data"))
 nltk.download('punkt')
 
 # Load intents from the JSON file
-if not os.path.exists(TASK_FILE):
-    with open(TASK_FILE, 'w', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Task', 'Deadline', 'Priority'])  # Header
-
+file_path = os.path.abspath("./intents.json")
+with open(file_path, "r") as file:
+    intents = json.load(file)
 
 # Initialize vectorizer and classifier
 vectorizer = TfidfVectorizer(ngram_range=(1, 4))
@@ -48,7 +46,6 @@ if not os.path.exists(TASK_FILE):
     with open(TASK_FILE, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(['Task', 'Deadline', 'Priority'])  # Header
-
 def get_task_priority(deadline):
     current_time = datetime.datetime.now()
     time_remaining = deadline - current_time
@@ -59,26 +56,24 @@ def get_task_priority(deadline):
         return "Medium"
     else:
         return "Low"
-
 # Function to add a task to CSV file
-def add_task(task, deadline_str, priority="Medium"):
+def add_task(task, deadline, priority="Medium"):
     try:
-        # Parse the deadline using dateparser
-        deadline = parse(deadline_str)  
+        deadline = parse(deadline_str)  # Parse the deadline using dateparser
         priority = get_task_priority(deadline)
         task_data = [task, deadline_str, priority]
-
-        # Save the task to the CSV file
+        
         with open(TASK_FILE, 'a', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
             writer.writerow(task_data)
-        
         return f"Task added with {priority} priority!"  # Inform the user that the task was added
     
     except Exception as e:
         return f"Error adding task: {str(e)}"
 
 # Function to retrieve tasks sorted by deadline
+
+
 def get_next_task():
     tasks = []
     with open(TASK_FILE, 'r', encoding='utf-8') as file:
@@ -116,6 +111,7 @@ def get_next_task():
     else:
         return "You have no upcoming tasks!"
 
+
 # Function to send a local notification
 def send_local_notification(task_name, time_remaining):
     notification.notify(
@@ -123,7 +119,6 @@ def send_local_notification(task_name, time_remaining):
         message=f"You have {time_remaining} left to complete this task.",
         timeout=10  # Notification duration in seconds
     )
-
 def get_initial_response():
     # Look for the default or greeting tag in the JSON file
     for intent in intents:
@@ -133,7 +128,8 @@ def get_initial_response():
 
 # Function to predict user input and return response
 def chatbot(input_text):
-    # Check if the input has the "next task" keyword indicating a request for next task
+    
+   # Check if the input has the "next task" keyword indicating a request for next task
     if "next task" in input_text.lower():
         task_response = get_next_task()
         initial_response = get_initial_response()
@@ -191,3 +187,6 @@ def main():
         You can input your tasks along with deadlines, and it will keep track of them.
         When you ask, it will tell you your next task to do.
         """)
+
+if __name__ == "__main__":
+    main()
